@@ -1,0 +1,92 @@
+﻿@model EditViewModel 
+@{
+        ViewData["Title"] = "Post Düzenle";
+}
+
+<style>
+    .content-wrapper {
+        padding: 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+        font-family: sans-serif;
+    }
+    .form-group {
+        padding-bottom: 12px;
+    }
+</style>
+
+<div class="content-wrapper">
+    <div class="row d-flex align-items-center pb-2 border-bottom mb-4">
+        <div class="col-auto">
+            <legend class="m-0 fw-bold">Post Güncelle</legend>
+        </div>
+    </div>
+    <form asp-action="Edit" asp-controller="Post" method="post" enctype="multipart/form-data">
+        <input asp-for="Post.id" hidden />
+        <div class="form-group">
+            <label asp-for="Post.baslik">Başlık</label>
+            <input asp-for="Post.baslik" class="form-control" />
+            <span asp-validation-for="Post.baslik" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Post.kategoriId">Kategoriler</label>
+            <select asp-for="Post.kategoriId" asp-items="Model.Kategoriler" class="form-control">
+                <option value="">Kategori Seç</option>
+            </select>
+            <span asp-validation-for="Post.kategoriId"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Post.yazar">Yazar</label>
+            <input asp-for="Post.yazar" class="form-control" />
+            <span asp-validation-for="Post.yazar" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Post.icerik">İçerik</label>
+            <textarea asp-for="Post.icerik" class="form-control" rows="5"> </textarea>
+            <span asp-validation-for="Post.yazar" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="resimUrl">Resiim</label>
+            <input asp-for="resimUrl" class="form-control" />
+        </div>
+    
+
+        <div class="form-group">
+            <label>Başlık (EN)</label>
+            <input asp-for="Post.baslik_EN" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label>Başlık (RU)</label>
+            <input asp-for="Post.baslik_RU" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label>İçerik (EN)</label>
+            <textarea asp-for="Post.icerik_EN" class="form-control" rows="5"></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>İçerik (RU)</label>
+            <textarea asp-for="Post.icerik_RU" class="form-control" rows="5"></textarea>
+        </div>
+
+        
+        <button type="submit" class="btn btn-primary mt-1">Güncelle</button>
+        <a asp-action="Index" asp-controller="Post" class="btn btn-danger mt-2 ms-1">İptal</a>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.tiny.cloud/1/8v7ap9no879e3vf48t9bipzno7dfbo8dgefvm9kgcttuz3nu/tinymce/7/tinymce.min.js" referrerpolicy="origin"></script>
+
+    <script>
+           tinymce.init({
+          selector: 'textarea'
+        });
+    </script>
+}

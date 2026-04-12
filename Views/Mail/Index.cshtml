@@ -1,0 +1,108 @@
+﻿@using System.Globalization
+@model MailViewModel
+@{
+    var lang = CultureInfo.CurrentUICulture.Name;
+    ViewData["Title"] =
+        lang == "en" ? "Contact Me" :
+        lang == "ru" ? "Связаться со мной" :
+        "Bana Ulaşın";
+}
+
+<style>
+    .content-wrapper {
+        padding: 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+        font-family: sans-serif;
+        padding-top:110px;
+    }
+
+    .form-group {
+        padding-bottom: 12px;
+    }
+
+    .custom-toast {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        width: 300px; 
+        z-index: 9999;
+        border: none;
+        border-left: 5px solid #198754; 
+    }
+
+    media (max-width: 576px) {
+            .custom-toast{
+            width: 260px;
+            right: 10px;
+            bottom: 10px;
+        }
+    }
+</style>
+
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-6">
+            <h2>@ViewData["Title"]</h2>
+        </div>
+    </div>
+
+    <hr />
+    <form asp-action="Index" asp-controller="Mail" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label asp-for="adSoyad">@localizer["adSoyad"]</label>
+            <input asp-for="adSoyad" class="form-control" />
+            <span asp-validation-for="adSoyad" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="email">@localizer["eposta"]</label>
+            <input asp-for="email" type="email" class="form-control" />
+            <span asp-validation-for="email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="konu">@localizer["konu"]</label>
+            <input asp-for="konu" class="form-control" />
+            <span asp-validation-for="konu" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="mesaj">@localizer["mesaj"]</label>
+            <textarea asp-for="mesaj" class="form-control" rows="5"></textarea>
+            <span asp-validation-for="mesaj" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-1">@localizer["gonder"]</button>
+    </form>
+</div>
+
+@if (ViewBag.Success != null)
+{
+    <div id="successToast" class="alert alert-success alert-dismissible fade show shadow-lg custom-toast" role="alert">
+        <div class="d-flex align-items-center">
+            <i class="fas fa-check-circle me-2 fs-5"></i>
+            <div>@ViewBag.Success</div>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        var toast = document.getElementById('successToast');
+        if (toast) {
+            // 6 saniye sonra kapatma işlemini başlat
+            setTimeout(function () {
+                // Bootstrap'in kendi "close" fonksiyonunu tetikler
+                var bsAlert = new bootstrap.Alert(toast);
+                bsAlert.close();
+            }, 6000);
+        }
+    });
+</script>

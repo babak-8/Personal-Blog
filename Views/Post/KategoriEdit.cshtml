@@ -1,0 +1,45 @@
+﻿@model Kategori
+@{
+    Layout = "_AdminLayout";
+}
+
+<style>
+    .content-wrapper {
+        padding: 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+        font-family: sans-serif
+    }
+
+    .form-group {
+        padding-bottom: 12px;
+    }
+</style>
+
+<div class="content-wrapper">
+    <div class="row d-flex align-items-center pb-2 border-bottom mb-4">
+        <div class="col-auto">
+            <legend class="m-0 fw-bold">Post Güncelle</legend>
+        </div>
+    </div>
+    <form asp-action="KategoriEdit" asp-controller="Post" method="post">
+        <input asp-for="id" type="hidden" />
+        <div class="form-group">
+            <label asp-for="isim">Kategori Adı</label>
+            <input asp-for="isim" class="form-control"  />
+            <span asp-validation-for="isim" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="isim_EN">Kategori Adı (EN)</label>
+            <input asp-for="isim_EN" class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label asp-for="isim_RU">Kategori Adı (RU)</label>
+            <input asp-for="isim_RU" class="form-control"  />
+        </div>
+        <button type="submit" class="btn btn-primary mt-1">Güncelle</button>
+        <a asp-action="Kategoriler" asp-controller="Post" class="btn btn-danger mt-1">İptal</a>
+    </form>
+</div>

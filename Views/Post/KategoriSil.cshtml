@@ -1,0 +1,14 @@
+﻿@model Kategori
+
+@{
+    ViewData["Title"] = "Kategori Sil";
+}
+
+<h2>@ViewData["Title"]</h2>
+<h4>Bu kategoriyi silmek istiyor musun?</h4>
+
+<form asp-controller="Post" asp-action="KategoriSil">
+    <input asp-for="id" hidden />
+    <button type="submit" class="btn btn-danger mt-2">Sil</button>
+    <a asp-action="Kategoriler" asp-controller="Post" class="btn btn-secondary mt-2 ms-1">İptal</a>
+</form>

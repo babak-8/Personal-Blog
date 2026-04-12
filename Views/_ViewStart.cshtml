@@ -1,0 +1,10 @@
+﻿@{
+    if (User.Identity.IsAuthenticated && User.Identity.Name == "adminbabak@gmail.com")
+    {
+        Layout = "_AdminLayout";
+    }
+    else
+    {
+        Layout = "_Layout";
+    }
+}

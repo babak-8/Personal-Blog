@@ -1,0 +1,367 @@
+﻿@using BabakBlog.Helpers
+@model IEnumerable<Post>
+@using System.Globalization
+@{
+    bool isAdmin = User.Identity.IsAuthenticated && User.Identity.Name == "adminbabak@gmail.com";
+    Layout = isAdmin ? "_AdminLayout" : "_Layout";
+    ViewData["Title"] = "Blog Postları";
+    var lang = CultureInfo.CurrentUICulture.Name;
+}
+
+@if (!isAdmin)
+{
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.12.1/css/all.min.css" />
+
+
+    <div class="container-fluid bg-light pt-5 pb-1">
+        <div class="container col-xxl-8 px-4 pt-5 pb-3">
+            <div class="row flex-lg-row-reverse align-items-center g-5 py-5">
+                <div class="col-10 col-sm-8 col-lg-6">
+                    <img src="/images/586ef26a-f5a2-40ac-afb8-84a4d76933e1.jpeg" class="d-block mx-lg-auto img-fluid rounded shadow" alt="Babak Blog" width="600" height="300" loading="lazy">
+                </div>
+                <div class="col-lg-6">
+                    <h1 class="display-5 fw-bold lh-1 mb-3">@localizer["heroBaslik"]</h1>
+                    <p class="lead">@localizer["heroParag"]</p>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-start">
+                        <button type="button" class="btn btn-primary btn-lg px-4 me-md-2" onclick="location.href='#bloglar'">@localizer["bloglar"]</button>
+                        <a asp-controller="Mail" asp-action="Index" class="btn btn-outline-secondary btn-lg px-4">
+                            @localizer["banaUlas"]
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <section class="blog-listing gray-bg py-5" id="bloglar">
+        <div class="container">
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="section-title border-start border-primary border-5 ps-3">
+                        <h2 class="fw-bold mb-0">@localizer["blogBaslik"]</h2>
+                        <p class="text-muted small mb-0">@localizer["blogAltBaslik"]</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row align-items-start">
+                <div class="col-lg-8">
+                    @if (!Model.Any())
+                    {
+                        <div class="alert alert-warning text-center mt-1">
+                            @localizer["postYokKategori"]
+                        </div>
+                    }
+                    else
+                    {
+                    <div class="row">
+                        @foreach (var post in Model)
+                        {
+                            <div class="col-sm-6 mb-4">
+                                <div class="blog-grid shadow-sm bg-white rounded overflow-hidden h-100">
+                                    <div class="blog-img position-relative">
+                                        <div class="date bg-primary text-white p-2 text-center position-absolute" style="z-index:10; width:60px; left:15px; top:15px; border-radius:5px;">
+                                            <span class="d-block fw-bold fs-5">@post.yayinTarih.ToString("dd")</span>
+                                            <label class="small text-uppercase m-0">@post.yayinTarih.ToString("MMM")</label>
+                                        </div>
+                                        <a asp-controller="Post" asp-action="Details" asp-route-id="@post.id">
+                                            <img src="@post.resimUrl" class="img-fluid w-100" style="height:315px; object-fit:cover;" alt="@post.baslik">
+                                        </a>
+                                    </div>
+                                    <div class="blog-info p-3">
+                                        <div class="mb-2">
+                                                <span class="badge bg-light text-primary border border-primary">
+                                                    @if (lang == "en")
+                                                    {
+                                                        @post.Kategori?.isim_EN
+                                                    }
+                                                    else if (lang == "ru")
+                                                    {
+                                                        @post.Kategori?.isim_RU
+                                                    }
+                                                    else
+                                                    {
+                                                        @post.Kategori?.isim
+                                                    }
+                                        </div>
+                                        <h5 class="fw-bold">
+                                            <a asp-controller="Post" asp-action="Details" asp-route-id="@post.id" class="text-dark text-decoration-none">
+                                                @if (lang == "en")
+                                                {
+                                                    @post.baslik_EN
+                                                }
+                                                else if (lang == "ru")
+                                                {
+                                                    @post.baslik_RU
+                                                }
+                                                else
+                                                {
+                                                    @post.baslik
+                                                }
+                                            </a>
+                                        </h5>
+                                        @{
+                                            
+                                            var rawContent =
+                                            lang == "en" ? post.icerik_EN :
+                                            lang == "ru" ? post.icerik_RU :
+                                            post.icerik;
+
+                                            var content = RemoveHtmlTagHelper.RemoveHtmlTags(rawContent ?? "");
+                                            var shortContent = content.Length > 90
+                                            ? content.Substring(0, 90) + "..."
+                                            : content;
+                                        }
+                                        <p class="text-muted small">@shortContent</p>
+
+                                        <div class="d-flex justify-content-between align-items-center border-top pt-3 mt-3">
+                                            <div class="btn-bar">
+                                                <a asp-controller="Post" asp-action="Details" asp-route-id="@post.id" class="px-btn-arrow text-primary fw-bold text-decoration-none small">
+                                                    <span>@localizer["dahaFazla"]</span>
+                                                    <i class="fas fa-arrow-right ms-1"></i>
+                                                </a>
+                                            </div>
+                                            <div class="meta text-muted small">
+                                                <span class="me-2"><i class="fas fa-user me-1"></i>@post.yazar</span>
+                                                <span><i class="fas fa-comments me-1"></i>@(post.Yorumlar?.Count ?? 0)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                    }
+                </div>
+
+                <div class="col-lg-4 blog-aside">
+                    <div class="widget widget-author shadow-sm p-4 bg-white rounded mb-4">
+                        <div class="widget-title border-bottom pb-2 mb-3">
+                            <h3 class="h5 m-0 fw-bold">@localizer["yazar"]</h3>
+                        </div>
+                        <div class="widget-body">
+                            <div class="media d-flex align-items-center mb-3">
+                                <div class="avatar me-3">
+                                    <img src="/images/e8842675-9698-4467-b434-cb34adeb7509.jpeg" class="rounded-circle border" width="60" height="60" alt="Author">
+                                </div>
+                                <div class="media-body">
+                                    <h6 class="m-0 fw-bold">Babak Pourkar</h6>
+                                </div>
+                            </div>
+                            <p class="small text-muted">
+                                @localizer["indexParag1"] <strong>@localizer["seviye"]</strong>.
+                                @localizer["indexParag2"]
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="widget widget-tags shadow-sm p-4 bg-white rounded">
+                        <div class="widget-title border-bottom pb-2 mb-3">
+                            <h3 class="h5 m-0 fw-bold">@localizer["kategoriler"]</h3>
+                        </div>
+                        <div class="widget-body">
+                            <div class="nav tag-cloud">
+                                @if (ViewBag.Kategoriler != null)
+                                {
+                                    @foreach (var kategori in ViewBag.Kategoriler)
+                                    {
+                                        <a asp-action="Index"
+                                           asp-fragment="bloglar"
+                                           asp-route-kategoriId="@kategori.id"
+                                           class="btn btn-sm m-1 @(Context.Request.Query["kategoriId"] == kategori.id.ToString() ? "btn-primary" : "btn-outline-secondary")">
+                                            @if (lang == "en")
+                                            {
+                                                @kategori?.isim_EN
+                                            }
+                                            else if (lang == "ru")
+                                            {
+                                                @kategori?.isim_RU
+                                            }
+                                            else
+                                            {
+                                                @kategori?.isim
+                                            }
+                                        </a>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <button type="button" class="btn btn-primary shadow-lg" id="btn-back-to-top"
+            style="position:fixed; bottom:30px; right:30px; display:none; z-index:999; border-radius:50%; width:50px; height:50px;">
+        <i class="fas fa-arrow-up"></i>
+    </button>
+}
+else
+{
+    <div class="d-flex justify-content-between align-items-center mt-4">
+        <a asp-action="Create" asp-controller="Post" class="btn btn-primary mt-1">
+            <i class="fas fa-plus me-1"></i> Post Ekle
+        </a>
+    </div>
+    <div class="table-responsive mt-4 shadow-sm rounded border">
+        <table class="table table-hover align-middle mb-0 bg-white">
+            <thead class="bg-dark text-white">
+                <tr>
+                    <th scope="col" class="ps-3" style="width: 100px;">Görsel</th>
+                    <th scope="col">Başlık (TR)</th>
+                    <th scope="col">Kategori</th>
+                    <th scope="col" class="text-center" style="width: 150px;">Yayın Tarihi</th>
+                    <th scope="col" class="text-end pe-4">İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td class="ps-3">
+                            <img src="@item.resimUrl" class="rounded shadow-sm" style="width: 60px; height: 40px; object-fit: cover;">
+                        </td>
+                        <td>
+                            <div class="fw-bold text-dark">
+                                @item.baslik
+                            </div>
+                            <small class="text-muted">Yazar: @item.yazar</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-light text-dark border px-3 py-2">
+                                @item.Kategori?.isim
+                            </span>
+                        </td>
+                        <td class="text-center">
+                            <div class="d-flex flex-column align-items-center">
+                                <span class="fw-bold text-dark" style="font-size: 0.9rem;">
+                                    @item.yayinTarih.ToString("dd.MM.yyyy")
+                                </span>
+                                <small class="text-muted" style="font-size: 0.75rem;">
+                                    @item.yayinTarih.ToString("HH:mm")
+                                </small>
+                            </div>
+                        </td>
+                        <td class="text-end pe-3">
+                            <div class="d-flex justify-content-end">
+                                <a asp-action="Edit" asp-route-id="@item.id" class="text-primary p-2 hover-bg-light rounded" title="Düzenle">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                <a asp-action="Delete" asp-route-id="@item.id" class="text-danger p-2 hover-bg-light rounded" title="Sil">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+
+
+<style>
+    .table-responsive::-webkit-scrollbar {
+        height: 5px;
+    }
+
+    .table-responsive::-webkit-scrollbar-thumb {
+        background: #ced4da;
+        border-radius: 10px;
+    }
+    media (max-width: 991px) {
+            .sidebar-admin{
+            position: fixed;
+            left: -280px;
+            z-index: 1050;
+        }
+
+        .main-content {
+            margin-left: 0 !important;
+            padding-left: 0 !important;
+            width: 100% !important;
+            display: block;
+        }
+
+        .container-fluid {
+            padding-left: 10px !important;
+            padding-right: 10px !important;
+        }
+    }
+
+    #btn-back-to-top {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        display: none;
+        z-index: 1000;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%; 
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+
+    .custom-row {
+        transition: 0.2s ease;
+    }
+
+    .col-id {
+        width: 50px;
+        text-align: center;
+    }
+
+    .col-img {
+        width: 60px;
+    }
+
+    .custom-img {
+        width: 50px;
+        height: 35px;
+        object-fit: cover;
+    }
+
+    .col-cat {
+        min-width: 120px;
+    }
+
+    .col-actions {
+        min-width: 100px;
+    }
+
+    media (max-width: 576px) {
+            .col-cat{
+            display: none;
+        }
+
+        .col-id {
+            display: none;
+        }
+    } 
+</style>
+
+<script>
+    let mybutton = document.getElementById("btn-back-to-top");
+
+    window.onscroll = function () {
+        scrollFunction();
+    };
+
+    function scrollFunction() {
+        if (document.body.scrollTop > 500 || document.documentElement.scrollTop > 500) {
+            mybutton.style.display = "block";
+        } else {
+            mybutton.style.display = "none";
+        }
+    }
+
+    // Butona tıklandığında yukarı çıkar
+    mybutton.addEventListener("click", backToTop);
+
+    function backToTop() {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // Yumuşak kayma efekti
+        });
+    }
+</script>

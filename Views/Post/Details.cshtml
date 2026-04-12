@@ -1,0 +1,186 @@
+﻿@model Post
+@using System.Globalization
+@{
+    var lang = CultureInfo.CurrentUICulture.Name;
+}
+
+@{
+    ViewData["Title"] = Model.baslik;
+}
+
+<style>
+    .content-wrapper {
+        padding: 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+        font-family: sans-serif;
+        padding-top:120px;
+    }
+
+    .feature-image {
+        width: 100%;
+        height: 500px;
+        object-fit: cover;
+        margin-bottom: 20px;
+    }
+</style>
+
+@if (User.IsInRole("Admin")){
+<div class="d-flex justify-content-between align-items-center">
+    <div class="me-auto">
+        <a asp-action="Index" class="btn btn-outline-secondary my-3">Geri</a>
+    </div>
+    <div>
+        <a class="btn btn-secondary my-3" asp-action="Edit" asp-controller="Post" asp-route-id="@Model.id">Düzenle</a>
+        <a class="btn btn-danger mx-3 my-3" asp-action="Delete" asp-controller="Post" asp-route-id="@Model.id">Sil</a>
+    </div>
+</div>
+}
+
+<div class="content-wrapper">
+    <!--<h1>Model.baslik</h1>-->
+    @if (lang == "en")
+    {
+        <h1>@Model.baslik_EN</h1>
+    }
+    else if (lang == "ru")
+    {
+        <h1>@Model.baslik_RU</h1>
+    }
+    else
+    {
+        <h1>@Model.baslik</h1>
+    }
+    
+    <p>
+        <span class="badge bg-primary">@localizer["yazar"]</span> @Model.yazar | <span class="badge bg-primary">
+            @localizer["yayinTarih"]
+        </span> @Model.yayinTarih.ToString("MMMM dd,yyyy") | <span class="badge bg-secondary">@localizer["kategoriİsmi"]</span> @Model.Kategori.isim
+    </p>
+    <img src="@Model.resimUrl" alt="@Model.baslik" class="feature-image" />
+    <hr />
+    <!--<div>Html.Raw(Model.icerik)</div>-->
+    <div>
+        @if (lang == "en")
+        {
+            @Html.Raw(Model.icerik_EN)
+        }
+        else if (lang == "ru")
+        {
+            @Html.Raw(Model.icerik_RU)
+        }
+        else
+        {
+            @Html.Raw(Model.icerik)
+        }
+    </div>
+    <hr />
+
+    <div id="commentContainer">
+        @if (Model.Yorumlar.Any())
+        {
+            <div id="commentSection">
+                @foreach (var comment in Model.Yorumlar)
+                {
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title">@comment.kullaniciAdi</h5>
+                            <p class="card-text text-muted">@comment.yorumTarih.ToString("MMMM dd,yyyy")</p>
+                            <p class="card-text">@comment.icerik</p>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p id="noCommentText" class="text-muted">@localizer["yorumYok"]</p>
+        }
+    </div>
+    <h4>@localizer["yorumEkle"]</h4>
+
+    <form id="commentForm">
+        <div class="form-group">
+            <label for="Username">@localizer["isim"]</label>
+            <input for="Username" id="Username" name="Username" required class="form-control" />
+        </div>
+
+        <div class="form-group">
+            <label for="Content">@localizer["icerik"]</label>
+            <textarea for="Content" id="Content" name="Content" rows="3" required class="form-control"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-2 p-2 rounded">@localizer["yorumKaydet"]</button>
+    </form>
+</div>
+
+
+@section Scripts {
+    <script>
+        $(document).ready(function(){
+            $("#commentForm").on('submit', function(event){
+                event.preventDefault();
+
+                var userName = $("#Username").val();
+                var content = $("#Content").val();
+                var postId = @Model.id;
+
+                $.ajax({
+                    url: '@Url.Action("AddComment", "Post")',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        kullaniciAdi: userName,
+                        icerik: content,
+                        postId: postId
+                    }),
+                    success: function(response){
+                        // Formu temizle
+                        $('#commentForm')[0].reset();
+
+                        // 1. "Henüz yorum yok" yazısı varsa onu hemen kaldır
+                        if ($('#noCommentText').length > 0) {
+                            $('#noCommentText').remove();
+                        } else {
+                            // Eğer ID yoksa klasik text üzerinden bulup siler
+                            $('.text-muted:contains("Henüz yorum yok")').remove();
+                        }
+
+                        // 2. Eğer sayfada hiç yorum yoksa (ilk yorumsa), #commentSection div'ini oluştur
+                        if ($('#commentSection').length === 0) {
+                            // Yorum Ekle (h4) başlığının hemen üzerine div'i yerleştiriyoruz
+                            $('<div id="commentSection"></div>').insertBefore("h4:contains('Yorum Ekle')");
+                        }
+
+                        // 3. Yeni yorumu senin istediğin kart yapısıyla hazırla
+                        // Not: Backend'den gelen veriye göre response.username veya response.kullaniciAdi kullanılır
+                        var newComment = `
+                            <div class="card mb-3 shadow-sm">
+                                <div class="card-body">
+                                    <h5 class="card-title">${response.username || response.kullaniciAdi}</h5>
+                                    <p class="card-text text-muted">${response.commentDate || "Az önce"}</p>
+                                    <p class="card-text">${response.content || response.icerik}</p>
+                                </div>
+                            </div>
+                        `;
+
+                        // 4. Hazırlanan kartı bölüme ekle
+                        $('#commentSection').append(newComment);
+
+                        // 5. Görsel bir geri bildirim için yeni yoruma kaydır
+                        $('html, body').animate({
+                            scrollTop: $("#commentSection").children().last().offset().top - 150
+                        }, 500);
+                    },
+                    error: function(xhr) {
+                        if (xhr.status === 401 || xhr.status === 403) {
+                            window.location.href = '@Url.Action("Login", "Auth")';
+                        } else {
+                            alert("Yorum eklenirken bir hata oluştu. Lütfen bağlantınızı kontrol edin.");
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}

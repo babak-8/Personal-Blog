@@ -1,0 +1,58 @@
+﻿@model RegisterViewModel
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@inject IStringLocalizer<SharedResource> SharedLocalizer
+@{
+    var lang = CultureInfo.CurrentUICulture.Name;
+
+    ViewData["Title"] = lang switch
+    {
+        "en" => "Create Account",
+        "ru" => "Создать аккаунт",
+        _ => "Hesap Oluştur"
+    };
+}
+
+<style>
+    .content-wrapper {
+        padding: 20px;
+        max-width: 1000px;
+        margin: 0 auto;
+        font-family: sans-serif;
+        padding-top:110px;
+    }
+    .form-group{
+        padding-bottom:12px;
+    }
+</style>
+
+
+<div class="content-wrapper">
+    <div class="row">
+        <div class="col-6">
+            <h2>@ViewData["Title"]</h2>
+        </div>      
+    </div>
+
+    <hr />
+
+    <form asp-action="Register" asp-controller="Auth" method="post">
+        <div class="form-group">
+            <label asp-for="email">@SharedLocalizer["eposta"]</label>
+            <input asp-for="email" class="form-control" />
+            <span asp-validation-for="email" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="sifre">@SharedLocalizer["sifre"]</label>
+            <input asp-for="sifre" class="form-control" />
+            <span asp-validation-for="sifre" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="sifreOnay">@SharedLocalizer["sifreTekrar"]</label>
+            <input asp-for="sifreOnay" class="form-control" />
+            <span asp-validation-for="sifreOnay" class="text-danger"></span>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-1">@SharedLocalizer["kayitOl"]</button>
+    </form>
+</div>

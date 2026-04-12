@@ -1,0 +1,14 @@
+﻿@model Yorum
+
+@{
+    ViewData["Title"] = "Yorum Sil";
+}
+
+<h2>@ViewData["Title"]</h2>
+<h4>Bu yorumu silmek istiyor musun?</h4>
+
+<form asp-controller="Post" asp-action="YorumSil" method="post">
+    <input asp-for="id" hidden />
+    <button type="submit" class="btn btn-danger mt-2">Sil</button>
+    <a asp-action="YorumlarYonetimi" asp-controller="Post" class="btn btn-secondary mt-2 ms-1">İptal</a>
+</form>

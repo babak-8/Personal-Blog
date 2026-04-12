@@ -1,0 +1,52 @@
+﻿<!--<footer class="border-top footer text-muted">
+    <div class="container">
+        &copy; 2026 - gerek - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+    </div>
+</footer>-->
+
+<style>
+    /* Sticky Footer Ayarı */
+    html, body {
+        height: 100%;
+    }
+
+    body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    main {
+        flex: 1 0 auto;
+    }
+
+    /* Footer Özel Stilleri */
+    .footer {
+        flex-shrink: 0;
+        background-color: #ffffff;
+    }
+
+    .hover-primary:hover {
+        color: #0d6efd !important;
+        transition: 0.3s;
+    }
+
+    /* Sosyal medya ikonları için hover efekti */
+    .footer i:hover {
+        color: #0d6efd;
+        transform: translateY(-2px);
+        transition: all 0.3s;
+    }
+</style>
+
+<div class="container mt-auto">
+    @* mt-auto: İçerik az olsa bile footer'ı aşağı iter *@
+    <footer class="d-flex flex-wrap justify-content-between align-items-center py-3 my-4 border-top">
+        <p class="col-md-4 mb-0 text-body-secondary small">© 2026 <strong>Babak</strong></p>
+
+        <ul class="nav col-md-4 justify-content-end">
+            <li class="nav-item"><a href="/" class="nav-link px-2 text-body-secondary small">@localizer["anasayfa"]</a></li>
+            <li class="nav-item"><a href="#" class="nav-link px-2 text-body-secondary small">@localizer["hakkimda"]</a></li>
+            <li class="nav-item"><a asp-controller="Mail" asp-action="Index" class="nav-link px-2 text-body-secondary small">@localizer["iletisim"]</a></li>
+        </ul>
+    </footer>
+</div>
